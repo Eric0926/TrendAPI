@@ -17,8 +17,8 @@ def fetch_stats(transaction):
 def fetch_candidates(transaction):
     query = """
             SELECT * FROM candidate_table 
-            WHERE candidate_id IN (138203134, 15764644, 818948638890217473, 29501253, 13218102, 942156122, 18166778, 482450423, 21059255, 1079104563280527364)
-            """
+            WHERE candidate_id IN {}
+            """.format("(138203134, 15764644, 818948638890217473, 29501253, 13218102)")
     result = transaction.execute_sql(query)
     return list(result)
 
