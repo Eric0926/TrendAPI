@@ -6,7 +6,7 @@ database = instance.database("twitter_db")
 
 
 def fetch_stats(transaction):
-    query = """SELECT * FROM six_hout_stat"""
+    query = """SELECT * FROM six_hour_stat"""
     result = transaction.execute_sql(query)
     return list(result)
 
