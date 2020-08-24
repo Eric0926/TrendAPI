@@ -35,7 +35,7 @@ if __name__ == "__main__":
     for i in range(10):
         x = {}
         x["name"] = tops_info[i][1]
-        x["party"] = tops_indo[i][2]
+        x["party"] = tops_info[i][2]
         x["state"] = tops_info[i][3] if tops_info[i][3] is not None else "none"
         x["twitterID"] = tops_info[i][4] if tops_info[i][4] is not None else "none"
         x["reply"] = tops[i][2]
