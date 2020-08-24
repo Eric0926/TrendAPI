@@ -24,7 +24,7 @@ def trends():
         x["retweet"] = tops[i][4]
         trends.append(x)
     trends_json = json.dumps(trends)
-    return jsonify(trends_json), 200
+    return jsonify(trends), 200
 
 
 if __name__ == "__main__":
