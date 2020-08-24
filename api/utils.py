@@ -17,8 +17,8 @@ def fetch_stats(transaction):
 def fetch_candidates(transaction):
     query = """
             SELECT * FROM candidate_table 
-            WHERE candidate_id IN {}
-            """.format("(138203134, 15764644, 818948638890217473, 29501253, 13218102)")
+            WHERE candidate_id IN ({})
+            """.format("138203134, 15764644, 818948638890217473, 29501253, 13218102")
     result = transaction.execute_sql(query)
     return list(result)
 
@@ -28,6 +28,6 @@ if __name__ == "__main__":
     results_sorted = sorted(
         results, key=lambda result: (-result[2], -result[3]))
     tops = sorted(results_sorted[:10], key=lambda x: x[0])
-    print([x[0] for x in tops])
+    tops_id = ",".join(str(x) for x[0] in tops)
     tops_info = database.run_in_transaction(fetch_candidates)
     print(tops_info)
