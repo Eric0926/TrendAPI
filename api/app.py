@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, jsonify
 from utils import *
 
 app = Flask(__name__)
@@ -24,7 +24,7 @@ def trends():
         x["retweet"] = tops[i][4]
         trends.append(x)
     trends_json = json.dumps(trends)
-    return trends_json, 200
+    return jsonify(trends_json), 200
 
 
 if __name__ == "__main__":
