@@ -28,6 +28,6 @@ if __name__ == "__main__":
     results_sorted = sorted(
         results, key=lambda result: (-result[2], -result[3]))
     tops = sorted(results_sorted[:10], key=lambda x: x[0])
-    tops_id = ",".join(str(x) for x[0] in tops)
+    tops_id = ",".join(str(x[0]) for x in tops)
     tops_info = database.run_in_transaction(fetch_candidates)
     print(tops_info)
