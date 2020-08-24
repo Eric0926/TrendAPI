@@ -42,6 +42,7 @@ if __name__ == "__main__":
         x["toxic"] = tops[i][3]
         x["retweet"] = tops[i][4]
         trends.append(x)
-    trends_json = json.dumps(trends)
-    for x in trends_json:
+    for x in trends[:3]:
         print(x)
+    trends_json = json.dumps(trends[:3])
+    print(trends_json)
