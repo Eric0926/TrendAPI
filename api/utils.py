@@ -1,6 +1,6 @@
 from google.cloud import spanner
 
-client = spanner.client("yiqing-twitter-candidates")
+client = spanner.Client("yiqing-twitter-candidates")
 instance = client.instance("twitter-attack")
 database = instance.database("twitter_db")
 
