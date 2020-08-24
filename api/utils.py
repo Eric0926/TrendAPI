@@ -17,6 +17,6 @@ def fetch_stats(transaction):
 if __name__ == "__main__":
     results = database.run_in_transaction(fetch_stats)
     results_sorted = sorted(
-        results, key=lambda result: (-results[2], -result[3]))
+        results, key=lambda result: (-result[2], -result[3]))
     for result in results_sorted[:15]:
         print(result)
