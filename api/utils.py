@@ -22,5 +22,5 @@ if __name__ == "__main__":
     results = database.run_in_transaction(fetch_stats)
     results_sorted = sorted(
         results, key=lambda result: (-result[2], -result[3]))
-    tops = results_sorted[:10]
+    tops = sorted(results_sorted[:10], key=lambda x: x[0])
     print([x[0] for x in tops])
