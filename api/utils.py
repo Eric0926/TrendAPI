@@ -13,4 +13,4 @@ def fetch_stats(transaction):
 
 if __name__ == "__main__":
     results = database.run_in_transaction(fetch_stats)
-    print(results)
+    print(results[:5])
