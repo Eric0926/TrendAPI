@@ -23,9 +23,7 @@ def trends():
         x["toxic"] = tops[i][3]
         x["retweet"] = tops[i][4]
         trends.append(x)
-    for x in trends[:3]:
-        print(x)
-    trends_json = json.dumps(trends[:3])
+    trends_json = json.dumps(trends)
     return trends_json, 200
 
 
