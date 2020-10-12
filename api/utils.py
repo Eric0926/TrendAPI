@@ -38,16 +38,6 @@ def fetchLastWeekStats(transaction, start_time, end_time):
     result = transaction.execute_sql(query)
     return list(result)
 
-def fetchLastWeekStats(transaction, start_time, end_time):
-    # test = "2020-10-08T06:00:00Z"
-    query = """
-            SELECT * FROM one_hour_stat
-            WHERE commit_time >= TIMESTAMP("{}")
-            AND commit_time <= TIMESTAMP("{}")
-            AND toxic_reply != 0 AND reply != 0
-            """.format(start_time, end_time)
-    result = transaction.execute_sql(query)
-    return list(result)
 
 # candidate-2020 contains id, name followers_count, friends_count, handle, party, position
 def fetch_candidates(transaction, tops_id):
@@ -161,7 +151,7 @@ if __name__ == "__main__":
     sorted_last_hour_table = process_new_candidate_table(all_info_last_hour, all_last_hour)
     top10_in_last_hour = sorted_last_hour_table[:10]
     # print(top10_in_last_hour)
-    print("Last Hour Stats\n")
+    print("Last Hour Stats")
     trends_in_last_hour = generate_the_trend(top10_in_last_hour)
     for x in trends_in_last_hour[:10]:
         print(x)
