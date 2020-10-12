@@ -10,19 +10,29 @@ database = instance.database("twitter_db")
 
 # return: a list of top 10 candidates ascendingly by num_of_toxic / log(num_of_followers)
 # id/time/reply/toxic/opposing/retweet
+
+# @params: time_id: datetime
 def fetchLastHourStats(transaction, time_id):
-    test = "2020-10-08T06:00:00Z"
     query = """
             SELECT * FROM one_hour_stat
-            WHERE commit_time = TIMESTAMP(“{}”)AND toxic_reply != 0 AND reply != 0
+            WHERE commit_time = TIMESTAMP("{}")
             """.format(time_id)
-    # query = """
-    #         SELECT * FROM one_hour_stat
-    #         WHERE commit_time = TIMESTAMP("{}")AND toxic_reply != 0 AND reply != 0
-    #         """.format(test)
-    print(query)
     result = transaction.execute_sql(query)
     return list(result)
+
+
+def sampleFetchLastHour():
+    tt = datetime.now(timezone.utc)
+
+    t = datetime(tt.year, tt.month, tt.day, tt.hour, 0,
+                 0, tzinfo=timezone.utc) if t.minute >= 15 else datetime(tt.year, tt.month, tt.day, tt.hour - 1, 0,
+                                                                         0, tzinfo=timezone.utc)
+
+    results = spanner_database.run_in_transaction(fetchLastHourStats, t)
+
+    print(len(results))
+    print(results[:5])
+
 
 def fetchLastWeekStats(transaction):
     query = """
@@ -33,6 +43,8 @@ def fetchLastWeekStats(transaction):
     return list(result)
 
 # candidate-2020 contains id, name followers_count, friends_count, handle, party, position
+
+
 def fetch_candidates(transaction, tops_id):
     query = """
             SELECT * FROM candidate_2020
@@ -41,7 +53,9 @@ def fetch_candidates(transaction, tops_id):
     result = transaction.execute_sql(query)
     return list(result)
 
-#method 2
+# method 2
+
+
 def updates(transaction, time_id):
     query = """
             SELECT * FROM one_hour_stat
@@ -49,11 +63,12 @@ def updates(transaction, time_id):
             AND toxic_reply != 0 AND reply != 0
             """
     result = transaction.execute_sql(
-             query,
-             params = {'time_id': time_id},
-             param_types = {'time_id': spanner.param_types.STRING}
+        query,
+        params={'time_id': time_id},
+        param_types={'time_id': spanner.param_types.STRING}
     )
     return list(result)
+
 
 # * last hour reply num 
 # * last hour retweet num 
@@ -69,10 +84,10 @@ if __name__ == "__main__":
     start_time = end_time - timedelta(hours=1)
     tt = end_time
     time = datetime(tt.year, tt.month, tt.day,
-                       tt.hour,tt.minute, tt.second)
+                    tt.hour, tt.minute, tt.second)
     string = datetime.utcnow().isoformat()
     print(string)
-    time_id  = string[0:19]+'Z'
+    time_id = string[0:19]+'Z'
     print(time_id)
     time_id.strip()
     x = list(time_id)
@@ -109,7 +124,8 @@ if __name__ == "__main__":
         # opposing
         entry.append(all[i][4])
         new_candidate_table.append(entry)
-    sorted_new_candidate_table = sorted(new_candidate_table, key= lambda result: (-math.log(result[5])/math.log(result[2])))
+    sorted_new_candidate_table = sorted(
+        new_candidate_table, key=lambda result: (-math.log(result[5])/math.log(result[2])))
     top10 = sorted_new_candidate_table[:10]
     top10 = list(reversed(top10))
     # ascendingly allocate 10 candidate
@@ -117,7 +133,7 @@ if __name__ == "__main__":
     print(sorted_new_candidate_table)
     print("\n")
     print(top10)
-    #print(tops)
+    # print(tops)
     # print('\n')
     # print(tops)
     # tops_id = ",".join(str(x[0]) for x in tops)
