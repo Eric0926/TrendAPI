@@ -1,31 +1,28 @@
-from flask import Flask, jsonify
+from flask import Flask, request, jsonify
 from utils import *
 
 app = Flask(__name__)
 
 
-@app.route("/trends")
-def trends():
-    results = database.run_in_transaction(fetch_stats)
-    results_sorted = sorted(
-        results, key=lambda result: (-result[2], -result[3]))
-    tops = sorted(results_sorted[:10], key=lambda x: x[0])
-    tops_id = ",".join(str(x[0]) for x in tops)
-    tops_info = database.run_in_transaction(fetch_candidates, tops_id)
-    trends = []
-    for i in range(10):
-        x = {}
-        x["name"] = tops_info[i][1]
-        x["party"] = tops_info[i][2]
-        x["state"] = tops_info[i][3] if tops_info[i][3] is not None else "none"
-        x["twitterID"] = tops_info[i][4] if tops_info[i][4] is not None else "none"
-        x["reply"] = tops[i][2]
-        x["toxic"] = tops[i][3]
-        x["retweet"] = tops[i][4]
-        trends.append(x)
-    trends_json = json.dumps(trends)
-    return jsonify(trends), 200
+@app.route("/fetchLastHour", methods=["GET"])
+def fetchLastHour():
+    trends = lastHour()
+    data = {"stats": trends}
+    return jsonify(data), 200
+
+
+@app.route("/fetchLastNDays", methods=["POST"])
+def fetchLastNDays():
+
+    if ("candidate_id" not in request.json) or ("n_days" not in request.json):
+        return "Parameters Missing", 400
+
+    candidate_id = request.json["candidate_id"]
+    n_days = int(request.json["n_days"])
+    data = lastNDays(candidate_id, n_days)
+    return jsonify(data)
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8000)
+    #app.run(host='0.0.0.0', port=8000)
+    app.run()
