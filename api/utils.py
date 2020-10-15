@@ -89,7 +89,7 @@ def generate_the_trend(top10_trend_table):
     trends = []
     for i in range(10):
         x = {}
-        x["id"] = top10_trend_table[i][0]
+        x["id"] = str(top10_trend_table[i][0])
         x["name"] = top10_trend_table[i][1]
         x["state"] = top10_trend_table[i][7]
         x["party"] = top10_trend_table[i][8]
