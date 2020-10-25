@@ -95,7 +95,7 @@ def generate_the_trend(top10_trend_table):
         x["party"] = top10_trend_table[i][8]
         x["handle"] = top10_trend_table[i][9]
         x["position"] = top10_trend_table[i][10]
-        # x["followers_count"] = top10_trend_table[i][2]
+        x["followers_count"] = top10_trend_table[i][2]
         x["reply"] = top10_trend_table[i][3]
         x["retweet"] = top10_trend_table[i][4]
         x["toxic_reply"] = top10_trend_table[i][5]
@@ -143,7 +143,8 @@ def lastNDays(candidate_id, n):
     info["handle"] = candidate_info[5]
 
     d = datetime.now(timezone.utc)
-    end_time = datetime(d.year, d.month, d.day, 0, 0, 0, tzinfo=timezone.utc)
+    end_time = datetime(d.year, d.month, d.day + 1,
+                        0, 0, 0, tzinfo=timezone.utc)
     start_time = end_time - timedelta(days=n)
     results = database.run_in_transaction(
         fetchCandidatePeriodStats, candidate_id, start_time, end_time)
@@ -192,7 +193,7 @@ if __name__ == "__main__":
         print(i)
     print("\n")
 
-    id = "7270292"
+    id = "1249982359"
     n = 10
     print("Last {} Days for {}".format(n, id))
     data = lastNDays(id, n)
