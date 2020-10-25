@@ -141,6 +141,7 @@ def lastNDays(candidate_id, n):
     info["party"] = candidate_info[2]
     info["position"] = candidate_info[3]
     info["handle"] = candidate_info[5]
+    info["followers_count"] = candidate_info[6]
 
     d = datetime.now(timezone.utc)
     end_time = datetime(d.year, d.month, d.day + 1,
