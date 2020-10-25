@@ -161,16 +161,23 @@ def lastNDays(candidate_id, n):
         stat["retweet"] = 0
         stats.append(stat)
 
-    # candidate_id, commit_time, reply, toxic_reply, opposing, retweet
+    data = {}
+    data["examples"] = []
+    data["example_urls"] = []
 
     for r in results:
+        # candidate_id, commit_time, reply, toxic_reply, opposing, retweet
         commit_date = str(r[1].date())
         stats[dateToIdx[commit_date]]["reply"] += r[2]
         stats[dateToIdx[commit_date]]["toxic_reply"] += r[3]
         stats[dateToIdx[commit_date]]["opposing"] += r[4]
         stats[dateToIdx[commit_date]]["retweet"] += r[5]
 
-    data = {}
+        # examples, example_urls
+        if r[6] is not None and len(data["examples"]) <= 10:
+            data["examples"].extend(r[6])
+            data["example_urls"].extend(r[7])
+
     data["info"] = info
     data["stats"] = stats
 
@@ -192,3 +199,5 @@ if __name__ == "__main__":
     print(data["info"])
     for i in data["stats"]:
         print(i)
+    print(data["examples"])
+    print(data["example_urls"])
