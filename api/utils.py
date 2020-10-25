@@ -37,6 +37,7 @@ def fetchCandidatePeriodStats(transaction, candidate_id, start_time, end_time):
             WHERE candidate_id = {}
             AND commit_time >= TIMESTAMP("{}")
             AND commit_time < TIMESTAMP("{}")
+            ORDER BY commit_time DESC
             """.format(candidate_id, start_time, end_time)
     result = transaction.execute_sql(query)
     return list(result)
