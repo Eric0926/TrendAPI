@@ -49,7 +49,7 @@ def fetchLastHourStats(time):
     cursor = db.cursor()
     sql = """
         SELECT * FROM one_hour_stat
-        WHERE commit_time="%s"
+        WHERE commit_time=%s
     """
     time_str = "{}-{}-{} {}:00:00".format(time.year,
                                           time.month, time.day, time.hour)
