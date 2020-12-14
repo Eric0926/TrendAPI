@@ -237,6 +237,7 @@ if __name__ == "__main__":
     end_time = datetime.now(timezone.utc)
     start_time = end_time - timedelta(hours=10)
     results = fetch_candidate_period_stats(id, start_time, end_time)
+    print(len(results))
     for r in results:
         print(r[:-2])
 
