@@ -22,7 +22,10 @@ def fetch_last_hour_stats(time):
     db = pymysql.connect("35.202.99.165", "root", "twitter123", "twitter")
     cursor = db.cursor()
     sql = """
-        SELECT * FROM one_hour_stat
+        SELECT * 
+        FROM one_hour_stat
+        LEFT JOIN candidate_2020
+        ON one_hour_stat.candidate_id = candidate_2020.candidate_id
         WHERE commit_time=%s
         ORDER BY candidate_id
     """
@@ -53,18 +56,18 @@ def fetch_candidate_period_stats(candidate_id, start_time, end_time):
 
 
 # candidate-2020 contains id, name followers_count, friends_count, handle, party, position
-def fetch_candidates(candidate_ids):
+def fetch_candidate(candidate_id):
     db = pymysql.connect("35.202.99.165", "root", "twitter123", "twitter")
     cursor = db.cursor()
     sql = """
         SELECT * FROM candidate_2020
-        WHERE candidate_id IN ({})
+        WHERE candidate_id=%s
         ORDER BY candidate_id
-    """.format(candidate_ids)
-    cursor.execute(sql)
-    results = cursor.fetchall()
+    """
+    cursor.execute(sql, (candidate_id))
+    result = cursor.fetchone()
     db.close()
-    return results
+    return result
 
 
 def process_new_candidate_table(all_info, all):
@@ -133,15 +136,10 @@ def last_hour():
                                                                                      lasthour, 0, 0, tzinfo=timezone.utc)
     # results contains: entry_id/candidate_id/time/reply/toxic/opposing/retweet/tweet_ids/toxic_user_ids
     results = fetch_last_hour_stats(t)
-    candidate_ids = ",".join(str(x[1]) for x in results)
-    if candidate_ids == "":
-        return []
-    candidate_infos = fetch_candidates(candidate_ids)
     print(len(results))
-    print(len(candidate_infos))
-    for info, r in list(zip(candidate_infos, results))[:5]:
-        print(info)
-        print(r[1:-2])
+    for r in results[:5]:
+        print(r[1:7], end="")
+        print(r[9:])
         print()
 
     # sorted_last_hour_table = process_new_candidate_table(
