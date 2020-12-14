@@ -1,12 +1,8 @@
 import json
 import math
-from google.cloud import spanner
+from google.cloud import datastore
 from datetime import datetime, timezone, timedelta
 import pymysql
-
-client = spanner.Client("yiqing-twitter-candidates")
-instance = client.instance("twitter-attack")
-database = instance.database("twitter_db")
 
 
 def fetch_last_hour_stats(time):
@@ -100,10 +96,9 @@ def last_hour_top20():
     return top20
 
 
-def lastNDays(candidate_id, n):
+def last_n_days(candidate_id, n):
 
-    candidate_info = database.run_in_transaction(
-        fetch_candidates, candidate_id)[0]
+    candidate_info = fetch_candidate(candidate_id)
     info = {}
     info["id"] = candidate_id
     info["name"] = candidate_info[4]
@@ -112,62 +107,60 @@ def lastNDays(candidate_id, n):
     info["position"] = candidate_info[3]
     info["handle"] = candidate_info[5]
     info["followers_count"] = candidate_info[6]
+    print(info)
 
-    d = datetime.now(timezone.utc)
-    end_time = datetime(d.year, d.month, d.day + 1,
-                        0, 0, 0, tzinfo=timezone.utc)
-    start_time = end_time - timedelta(days=n)
-    results = database.run_in_transaction(
-        fetchCandidatePeriodStats, candidate_id, start_time, end_time)
+    # d = datetime.now(timezone.utc)
+    # end_time = datetime(d.year, d.month, d.day + 1,
+    #                     0, 0, 0, tzinfo=timezone.utc)
+    # start_time = end_time - timedelta(days=n)
+    # results = database.run_in_transaction(
+    #     fetchCandidatePeriodStats, candidate_id, start_time, end_time)
 
-    stats = []
-    dateToIdx = {}
-    for i in range(n, 0, -1):
-        dd = end_time - timedelta(days=i)
-        stat = {}
-        stat["date"] = str(dd.date())
-        dateToIdx[stat["date"]] = n - i
-        stat["reply"] = 0
-        stat["toxic_reply"] = 0
-        stat["opposing"] = 0
-        stat["retweet"] = 0
-        stats.append(stat)
+    # stats = []
+    # dateToIdx = {}
+    # for i in range(n, 0, -1):
+    #     dd = end_time - timedelta(days=i)
+    #     stat = {}
+    #     stat["date"] = str(dd.date())
+    #     dateToIdx[stat["date"]] = n - i
+    #     stat["reply"] = 0
+    #     stat["toxic_reply"] = 0
+    #     stat["opposing"] = 0
+    #     stat["retweet"] = 0
+    #     stats.append(stat)
 
-    data = {}
-    data["examples"] = []
-    data["example_urls"] = []
+    # data = {}
+    # data["examples"] = []
+    # data["example_urls"] = []
 
-    for r in results:
-        # candidate_id, commit_time, reply, toxic_reply, opposing, retweet
-        commit_date = str(r[1].date())
-        stats[dateToIdx[commit_date]]["reply"] += r[2]
-        stats[dateToIdx[commit_date]]["toxic_reply"] += r[3]
-        stats[dateToIdx[commit_date]]["opposing"] += r[4]
-        stats[dateToIdx[commit_date]]["retweet"] += r[5]
+    # for r in results:
+    #     # candidate_id, commit_time, reply, toxic_reply, opposing, retweet
+    #     commit_date = str(r[1].date())
+    #     stats[dateToIdx[commit_date]]["reply"] += r[2]
+    #     stats[dateToIdx[commit_date]]["toxic_reply"] += r[3]
+    #     stats[dateToIdx[commit_date]]["opposing"] += r[4]
+    #     stats[dateToIdx[commit_date]]["retweet"] += r[5]
 
-        # examples, example_urls
-        if r[6] is not None and len(data["examples"]) <= 10:
-            data["examples"].extend(r[6])
-            data["example_urls"].extend(r[7])
+    #     # examples, example_urls
+    #     if r[6] is not None and len(data["examples"]) <= 10:
+    #         data["examples"].extend(r[6])
+    #         data["example_urls"].extend(r[7])
 
-    data["info"] = info
-    data["stats"] = stats
+    # data["info"] = info
+    # data["stats"] = stats
 
-    return data
+    # return data
 
 
 if __name__ == "__main__":
 
     # print("Last Hour Stats")
-    top20 = last_hour_top20()
-    for r in top20:
-        print(r)
-    # trends = lastHour()
-    # for i in trends:
-    #     print(i)
-    # print("\n")
+    # top20 = last_hour_top20()
+    # for r in top20:
+    #     print(r)
 
-    # id = "138203134"
+    id = "138203134"
+    last_n_days(id, 3)
     # end_time = datetime.now(timezone.utc)
     # start_time = end_time - timedelta(hours=10)
     # results = fetch_candidate_period_stats(id, start_time, end_time)

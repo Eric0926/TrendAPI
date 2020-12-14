@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 @app.route("/fetchLastHour", methods=["GET"])
 def fetchLastHour():
-    trends = lastHour()
+    trends = last_hour_top20()
     data = {"stats": trends}
     return jsonify(data), 200
 
