@@ -94,7 +94,7 @@ def last_hour():
     # results contains: candidate_id/time/reply/toxic/opposing/retweet/state/party/position/name/handle/followers_num/friends_num
     results = fetch_last_hour_stats(t)
     results.sort(
-        key=lambda x: (-math.log(x[3] + 1)/(math.log(result[-2] + 1)+1)))
+        key=lambda x: (-math.log(x[3] + 1)/(math.log(x[-2] + 1)+1)))
     for r in results[:10]:
         print(r)
     # top10_in_last_hour = sorted_last_hour_table[:10]
