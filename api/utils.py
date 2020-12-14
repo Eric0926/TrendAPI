@@ -149,7 +149,7 @@ def last_n_days(candidate_id, n):
                 if len(data["examples"]) >= 10:
                     break
                 query = datastore_client.query(kind='tweets')
-                query.add_filter('__key__', '=', tweet_id)
+                query.add_filter('__key__', '=', int(tweet_id))
                 tweet = list(query.fetch(1))[0]
                 data["examples"].append(tweet['text'])
                 data["example_urls"].append(tweet['urls'][0] if len(
