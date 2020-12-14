@@ -53,6 +53,7 @@ def fetchLastHourStats(time):
     """
     time_str = "{}-{}-{} {}:00:00".format(time.year,
                                           time.month, time.day, time.hour)
+    print(time_str)
     cursor.execute(sql, (time_str))
     results = cursor.fetchall()
     return results
