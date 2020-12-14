@@ -56,6 +56,7 @@ def fetchLastHourStats(time):
     print(time_str)
     cursor.execute(sql, (time_str))
     results = cursor.fetchall()
+    db.close()
     return results
 
 
