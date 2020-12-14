@@ -140,21 +140,20 @@ def lastHour():
     print(len(results))
     for r in results[:5]:
         print(r)
-    pass
 
-    all_last_hour = sorted(results, key=lambda x: x[0])
-    all_id_last_hour = ",".join(str(x[0]) for x in all_last_hour)
-    if all_id_last_hour == "":
-        return []
-    all_info_last_hour = database.run_in_transaction(
-        fetch_candidates, all_id_last_hour)
+    # all_last_hour = sorted(results, key=lambda x: x[0])
+    # all_id_last_hour = ",".join(str(x[0]) for x in all_last_hour)
+    # if all_id_last_hour == "":
+    #     return []
+    # all_info_last_hour = database.run_in_transaction(
+    #     fetch_candidates, all_id_last_hour)
 
-    sorted_last_hour_table = process_new_candidate_table(
-        all_info_last_hour, all_last_hour)
-    top10_in_last_hour = sorted_last_hour_table[:10]
-    trends_in_last_hour = generate_the_trend(top10_in_last_hour)
+    # sorted_last_hour_table = process_new_candidate_table(
+    #     all_info_last_hour, all_last_hour)
+    # top10_in_last_hour = sorted_last_hour_table[:10]
+    # trends_in_last_hour = generate_the_trend(top10_in_last_hour)
 
-    return trends_in_last_hour
+    # return trends_in_last_hour
 
 
 def lastNDays(candidate_id, n):
