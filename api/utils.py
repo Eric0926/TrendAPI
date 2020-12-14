@@ -64,13 +64,13 @@ def fetch_candidate_period_stats(candidate_id, start_time, end_time):
     cursor = db.cursor()
     sql = """
         SELECT * FROM one_hour_stat
-        WHERE commit_time between %s and %s and candidate_id=%s
+        WHERE candidate_id=%s and commit_time between %s and %s
     """
     start_time_str = "{}-{}-{} {}:00:00".format(start_time.year,
                                                 start_time.month, start_time.day, start_time.hour)
     end_time_str = "{}-{}-{} {}:00:00".format(end_time.year,
                                               end_time.month, end_time.day, end_time.hour)
-    cursor.execute(sql, (start_time_str, end_time_str, candidate_id))
+    cursor.execute(sql, (candidate_id, start_time_str, end_time_str))
     results = cursor.fetchall()
     db.close()
     return results
