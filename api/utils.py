@@ -17,32 +17,6 @@ database = instance.database("twitter_db")
 # * 1-week toxic
 # * 1-week opposing
 
-# return: a list of top 10 candidates ascendingly by num_of_toxic / log(num_of_followers)
-# id/time/reply/toxic/opposing/retweet
-
-
-# def fetchLastHourStats(transaction, time):
-#     # test = "2020-10-08T06:00:00Z"
-#     query = """
-#             SELECT * FROM one_hour_stat
-#             WHERE commit_time = TIMESTAMP("{}") AND toxic_reply != 0
-#             """.format(time)
-#     result = transaction.execute_sql(query)
-#     return list(result)
-
-
-# def fetchCandidatePeriodStats(transaction, candidate_id, start_time, end_time):
-#     # test = "2020-10-08T06:00:00Z"
-#     query = """
-#             SELECT * FROM one_hour_stat
-#             WHERE candidate_id = {}
-#             AND commit_time >= TIMESTAMP("{}")
-#             AND commit_time < TIMESTAMP("{}")
-#             ORDER BY commit_time DESC
-#             """.format(candidate_id, start_time, end_time)
-#     result = transaction.execute_sql(query)
-#     return list(result)
-
 
 def fetch_last_hour_stats(time):
     db = pymysql.connect("35.202.99.165", "root", "twitter123", "twitter")
@@ -137,6 +111,9 @@ def generate_the_trend(top10_trend_table):
         trends.append(x)
     return trends
 
+# return: a list of top 10 candidates ascendingly by num_of_toxic / log(num_of_followers)
+# id/time/reply/toxic_reply/opposing/retweet/
+
 
 def last_hour():
     # last_hour_stat calculation
@@ -147,11 +124,11 @@ def last_hour():
     t = datetime(tt.year, tt.month, tt.day,
                  tt.hour, 0, 0, tzinfo=timezone.utc)if tt.minute >= 15 else datetime(tt.year, tt.month, tt.day,
                                                                                      lasthour, 0, 0, tzinfo=timezone.utc)
-    # last hour table contains: # id/time/reply/toxic/opposing/retweet
+    # last hour table contains: # id/time/reply/toxic/opposing/retweet/tweet_ids/toxic_user_ids
     results = fetch_last_hour_stats(t)
     print(len(results))
-    for r in results[:5]:
-        print(r[:-2])
+    print(results[0])
+    print(type(results[0]))
 
     # all_last_hour = sorted(results, key=lambda x: x[0])
     # all_id_last_hour = ",".join(str(x[0]) for x in all_last_hour)
@@ -233,13 +210,13 @@ if __name__ == "__main__":
     #     print(i)
     # print("\n")
 
-    id = "138203134"
-    end_time = datetime.now(timezone.utc)
-    start_time = end_time - timedelta(hours=10)
-    results = fetch_candidate_period_stats(id, start_time, end_time)
-    print(len(results))
-    for r in results:
-        print(r[:-2])
+    # id = "138203134"
+    # end_time = datetime.now(timezone.utc)
+    # start_time = end_time - timedelta(hours=10)
+    # results = fetch_candidate_period_stats(id, start_time, end_time)
+    # print(len(results))
+    # for r in results:
+    #     print(r[:-2])
 
     # id = "1249982359"
     # n = 10
