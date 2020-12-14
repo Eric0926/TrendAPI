@@ -151,7 +151,7 @@ def last_hour():
     results = fetch_last_hour_stats(t)
     print(len(results))
     for r in results[:5]:
-        print(r)
+        print(r[:-2])
 
     # all_last_hour = sorted(results, key=lambda x: x[0])
     # all_id_last_hour = ",".join(str(x[0]) for x in all_last_hour)
@@ -238,7 +238,7 @@ if __name__ == "__main__":
     start_time = end_time - timedelta(hours=10)
     results = fetch_candidate_period_stats(id, start_time, end_time)
     for r in results:
-        print(r)
+        print(r[:-2])
 
     # id = "1249982359"
     # n = 10
