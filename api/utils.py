@@ -4,12 +4,14 @@ from google.cloud import datastore
 from datetime import datetime, timezone, timedelta
 import pymysql
 
+datastore_client = datastore.Client("yiqing-2020-twitter")
+
 
 def fetch_last_hour_stats(time):
     db = pymysql.connect("35.202.99.165", "root", "twitter123", "twitter")
     cursor = db.cursor()
     sql = """
-        SELECT a.candidate_id, a.reply, a.toxic_reply, a.opposing_party_toxic_reply, a.retweet, b.candidate_state, b.candidate_party, b.candidate_position, b.candidate_name, b.candidate_handle, b.candidate_followers_num, b.candidate_friends_num
+        SELECT a.candidate_id, a.reply, a.toxic_reply, a.opposing_party_toxic_reply, a.retweet, b.candidate_state, b.candidate_party, b.candidate_position, b.candidate_name, b.candidate_handle, b.candidate_followers_num
         FROM one_hour_stat a
         LEFT JOIN candidate_2020 b
         ON a.candidate_id = b.candidate_id
@@ -87,7 +89,7 @@ def last_hour_top20():
     t = datetime(tt.year, tt.month, tt.day,
                  tt.hour, 0, 0, tzinfo=timezone.utc)if tt.minute >= 15 else datetime(tt.year, tt.month, tt.day,
                                                                                      lasthour, 0, 0, tzinfo=timezone.utc)
-    # results contains: candidate_id/reply/toxic/opposing/retweet/state/party/position/name/handle/followers_num/friends_num
+    # results contains: candidate_id/reply/toxic/opposing/retweet/state/party/position/name/handle/followers_num
     results = fetch_last_hour_stats(t)
     results.sort(
         key=lambda x: (-math.log(x[2] + 1)/(math.log(x[-2] + 1)+1)))
@@ -109,42 +111,45 @@ def last_n_days(candidate_id, n):
     info["followers_count"] = candidate_info[6]
     print(info)
 
-    # d = datetime.now(timezone.utc)
-    # end_time = datetime(d.year, d.month, d.day + 1,
-    #                     0, 0, 0, tzinfo=timezone.utc)
-    # start_time = end_time - timedelta(days=n)
-    # results = database.run_in_transaction(
-    #     fetchCandidatePeriodStats, candidate_id, start_time, end_time)
+    d = datetime.now(timezone.utc)
+    end_time = datetime(d.year, d.month, d.day + 1,
+                        0, 0, 0, tzinfo=timezone.utc)
+    start_time = end_time - timedelta(days=n)
+    results = fetch_candidate_period_stats(candidate_id, start_time, end_time)
 
-    # stats = []
-    # dateToIdx = {}
-    # for i in range(n, 0, -1):
-    #     dd = end_time - timedelta(days=i)
-    #     stat = {}
-    #     stat["date"] = str(dd.date())
-    #     dateToIdx[stat["date"]] = n - i
-    #     stat["reply"] = 0
-    #     stat["toxic_reply"] = 0
-    #     stat["opposing"] = 0
-    #     stat["retweet"] = 0
-    #     stats.append(stat)
+    stats = []
+    dateToIdx = {}
+    for i in range(n, 0, -1):
+        dd = end_time - timedelta(days=i)
+        stat = {}
+        stat["date"] = str(dd.date())
+        stat["reply"] = 0
+        stat["toxic_reply"] = 0
+        stat["opposing"] = 0
+        stat["retweet"] = 0
+        stats.append(stat)
+        dateToIdx[stat["date"]] = n - i
 
-    # data = {}
-    # data["examples"] = []
-    # data["example_urls"] = []
+    data = {}
+    data["examples"] = []
+    data["example_urls"] = []
 
-    # for r in results:
-    #     # candidate_id, commit_time, reply, toxic_reply, opposing, retweet
-    #     commit_date = str(r[1].date())
-    #     stats[dateToIdx[commit_date]]["reply"] += r[2]
-    #     stats[dateToIdx[commit_date]]["toxic_reply"] += r[3]
-    #     stats[dateToIdx[commit_date]]["opposing"] += r[4]
-    #     stats[dateToIdx[commit_date]]["retweet"] += r[5]
+    # stat_id/candidate_id/commit_time/reply/toxic_reply/opposing_party_toxic_reply/retweet/tweet_ids/toxic_user_ids
+    for r in results:
+        # candidate_id, commit_time, reply, toxic_reply, opposing, retweet
+        commit_date = str(r[2].date())
+        stats[dateToIdx[commit_date]]["reply"] += r[3]
+        stats[dateToIdx[commit_date]]["toxic_reply"] += r[4]
+        stats[dateToIdx[commit_date]]["opposing"] += r[5]
+        stats[dateToIdx[commit_date]]["retweet"] += r[6]
 
-    #     # examples, example_urls
-    #     if r[6] is not None and len(data["examples"]) <= 10:
-    #         data["examples"].extend(r[6])
-    #         data["example_urls"].extend(r[7])
+        # examples, example_urls
+        # if r[6] is not None and len(data["examples"]) <= 10:
+        #     data["examples"].extend(r[6])
+        #     data["example_urls"].extend(r[7])
+
+    for s in stats[:5]:
+        print(s)
 
     # data["info"] = info
     # data["stats"] = stats
