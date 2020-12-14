@@ -21,24 +21,6 @@ database = instance.database("twitter_db")
 # id/time/reply/toxic/opposing/retweet
 
 
-def fetchLastHourStats(time):
-    db = pymysql.connect("35.202.99.165", "root", "twitter123", "twitter")
-    cursor = db.cursor()
-    sql = """
-        SELECT * FROM one_hour_stat
-        WHERE commit_time="%s"
-    """
-    time_str = "{}-{}-{} {}:00:00".format(time.year,
-                                          time.month, time.day, time.hour)
-    cursor.excute(sql, (time_str))
-    results = cursor.fetchall()
-    return results
-
-
-def fetchCandidatePeriodStats(candidate_id, start_time, end_time):
-    db = pymysql.connect("35.202.99.165", "root", "twitter123", "twitter")
-
-
 # def fetchLastHourStats(transaction, time):
 #     # test = "2020-10-08T06:00:00Z"
 #     query = """
@@ -60,6 +42,24 @@ def fetchCandidatePeriodStats(candidate_id, start_time, end_time):
 #             """.format(candidate_id, start_time, end_time)
 #     result = transaction.execute_sql(query)
 #     return list(result)
+
+
+def fetchLastHourStats(time):
+    db = pymysql.connect("35.202.99.165", "root", "twitter123", "twitter")
+    cursor = db.cursor()
+    sql = """
+        SELECT * FROM one_hour_stat
+        WHERE commit_time="%s"
+    """
+    time_str = "{}-{}-{} {}:00:00".format(time.year,
+                                          time.month, time.day, time.hour)
+    cursor.execute(sql, (time_str))
+    results = cursor.fetchall()
+    return results
+
+
+def fetchCandidatePeriodStats(candidate_id, start_time, end_time):
+    db = pymysql.connect("35.202.99.165", "root", "twitter123", "twitter")
 
 
 # candidate-2020 contains id, name followers_count, friends_count, handle, party, position
