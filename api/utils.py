@@ -51,13 +51,17 @@ def fetch_candidate_period_stats(candidate_id, start_time, end_time):
 
 
 # candidate-2020 contains id, name followers_count, friends_count, handle, party, position
-def fetch_candidates(transaction, tops_id):
-    query = """
-            SELECT * FROM candidate_2020
-            WHERE candidate_id IN ({})
-            """.format(tops_id)
-    result = transaction.execute_sql(query)
-    return list(result)
+def fetch_candidates(candidate_ids):
+    db = pymysql.connect("35.202.99.165", "root", "twitter123", "twitter")
+    cursor = db.cursor()
+    sql = """
+        SELECT * FROM candidate_2020
+        WHERE candidate_id IN ({})
+    """.format(candidate_ids)
+    cursor.execute(sql)
+    results = cursor.fetchall()
+    db.close()
+    return results
 
 
 def process_new_candidate_table(all_info, all):
@@ -124,18 +128,18 @@ def last_hour():
     t = datetime(tt.year, tt.month, tt.day,
                  tt.hour, 0, 0, tzinfo=timezone.utc)if tt.minute >= 15 else datetime(tt.year, tt.month, tt.day,
                                                                                      lasthour, 0, 0, tzinfo=timezone.utc)
-    # last hour table contains: # id/time/reply/toxic/opposing/retweet/tweet_ids/toxic_user_ids
+    # results contains: entry_id/candidate_id/time/reply/toxic/opposing/retweet/tweet_ids/toxic_user_ids
     results = fetch_last_hour_stats(t)
-    print(len(results))
-    print(results[0])
-    print(type(results[0]))
 
-    # all_last_hour = sorted(results, key=lambda x: x[0])
-    # all_id_last_hour = ",".join(str(x[0]) for x in all_last_hour)
-    # if all_id_last_hour == "":
-    #     return []
-    # all_info_last_hour = database.run_in_transaction(
-    #     fetch_candidates, all_id_last_hour)
+    candidate_ids = ",".join(str(x[1]) for x in results)
+    if candidate_ids == "":
+        return []
+    candidate_infos = fetch_candidates(candidate_ids)
+    print(len(candidate_infos))
+    for info, r in zip(candidate_infos, results):
+        print(info)
+        print(r[:-2])
+        print()
 
     # sorted_last_hour_table = process_new_candidate_table(
     #     all_info_last_hour, all_last_hour)
