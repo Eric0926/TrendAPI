@@ -96,7 +96,7 @@ def last_hour():
     results.sort(
         key=lambda x: (-math.log(x[3] + 1)/(math.log(x[-2] + 1)+1)))
     for r in results[:10]:
-        print(r, (-math.log(r[3] + 1)/(math.log(r[-2] + 1)+1)))
+        print(r, math.log(r[3] + 1)/(math.log(r[-2] + 1)+1))
     # top10_in_last_hour = sorted_last_hour_table[:10]
     # trends_in_last_hour = generate_the_trend(top10_in_last_hour)
 
