@@ -5,14 +5,14 @@ app = Flask(__name__)
 
 
 @app.route("/fetchLastHour", methods=["GET"])
-def fetchLastHour():
+def fetch_last_hour():
     trends = last_hour_top20()
     data = {"stats": trends}
     return jsonify(data), 200
 
 
 @app.route("/fetchLastNDays", methods=["POST"])
-def fetchLastNDays():
+def fetch_last_n_days():
 
     if ("candidate_id" not in request.json) or ("n_days" not in request.json):
         return "Parameters Missing", 400

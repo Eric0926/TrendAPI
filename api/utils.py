@@ -94,7 +94,7 @@ def last_hour_top20():
     # results contains: candidate_id/reply/toxic/opposing/retweet/state/party/position/name/handle/followers_num
     results = fetch_last_hour_stats(t)
     results.sort(
-        key=lambda x: (-math.log(x[2] + 1)/(math.log(x[-2] + 1)+1)))
+        key=lambda x: (-math.log(x[2] + 1)/(math.log(x[10] + 1)+1)))
     top20 = generate_top20(results[:20])
 
     return top20
