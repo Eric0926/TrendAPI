@@ -18,7 +18,6 @@ def fetch_last_hour_stats(time):
         LEFT JOIN candidate_2020 b
         ON a.candidate_id = b.candidate_id
         WHERE commit_time=%s
-        ORDER BY a.candidate_id
     """
     time_str = "{}-{}-{} {}:00:00".format(time.year,
                                           time.month, time.day, time.hour)
