@@ -64,7 +64,7 @@ def fetch_candidate_period_stats(candidate_id, start_time, end_time):
     cursor = db.cursor()
     sql = """
         SELECT * FROM one_hour_stat
-        WHERE candidate_id=%s and commit_time>=%s and commit_time<=%s
+        WHERE candidate_id=%s and commit_time>=%s and commit_time<%s
     """
     start_time_str = "{}-{}-{} {}:00:00".format(start_time.year,
                                                 start_time.month, start_time.day, start_time.hour)
