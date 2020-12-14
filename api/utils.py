@@ -60,39 +60,6 @@ def fetch_candidate(candidate_id):
     return result
 
 
-def process_new_candidate_table(all_info, all):
-    new_candidate_table = []
-    for i in range(len(all_info)):
-        entry = []
-        # id
-        entry.append(all_info[i][0])
-        # name
-        entry.append(all_info[i][4])
-        # followers_count
-        entry.append(all_info[i][6])
-        # reply
-        entry.append(all[i][2])
-        # retweet
-        entry.append(all[i][5])
-        # toxic
-        entry.append(all[i][3])
-        # opposing
-        entry.append(all[i][4])
-        # state
-        entry.append(all_info[i][1])
-        # party
-        entry.append(all_info[i][2])
-        # handle
-        entry.append(all_info[i][5])
-        # position
-        entry.append(all_info[i][3])
-        new_candidate_table.append(entry)
-    sorted_new_candidate_table = sorted(
-        new_candidate_table, key=lambda result: (
-            -math.log(result[5] + 1)/(math.log(result[2] + 1)+1)))
-    return sorted_new_candidate_table
-
-
 def generate_the_trend(top10_trend_table):
     trends = []
     for i in range(10):
@@ -124,14 +91,12 @@ def last_hour():
     t = datetime(tt.year, tt.month, tt.day,
                  tt.hour, 0, 0, tzinfo=timezone.utc)if tt.minute >= 15 else datetime(tt.year, tt.month, tt.day,
                                                                                      lasthour, 0, 0, tzinfo=timezone.utc)
-    # results contains: entry_id/candidate_id/time/reply/toxic/opposing/retweet/tweet_ids/toxic_user_ids
+    # results contains: candidate_id/time/reply/toxic/opposing/retweet/state/party/position/name/handle/followers_num/friends_num
     results = fetch_last_hour_stats(t)
-    print(len(results))
-    for r in results[:5]:
+    results.sort(
+        key=lambda x: (-math.log(x[3] + 1)/(math.log(result[-2] + 1)+1)))
+    for r in results[:10]:
         print(r)
-
-    # sorted_last_hour_table = process_new_candidate_table(
-    #     all_info_last_hour, all_last_hour)
     # top10_in_last_hour = sorted_last_hour_table[:10]
     # trends_in_last_hour = generate_the_trend(top10_in_last_hour)
 
