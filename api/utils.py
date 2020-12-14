@@ -13,11 +13,11 @@ def fetch_last_hour_stats(time):
     db = pymysql.connect("35.202.99.165", "root", "twitter123", "twitter")
     cursor = db.cursor()
     sql = """
-        SELECT a.candidate_id, a.commit_time, a.reply, a.toxic_reply, a.opposing_party_toxic_reply, a.retweet, b.candidate_state, b.candidate_party, b.candidate_position, b.candidate_name, b.candidate_handle, b.candidate_followers_num, b.candidate_friends_num
+        SELECT a.candidate_id, a.reply, a.toxic_reply, a.opposing_party_toxic_reply, a.retweet, b.candidate_state, b.candidate_party, b.candidate_position, b.candidate_name, b.candidate_handle, b.candidate_followers_num, b.candidate_friends_num
         FROM one_hour_stat a
         LEFT JOIN candidate_2020 b
         ON a.candidate_id = b.candidate_id
-        WHERE commit_time=%s
+        WHERE a.commit_time=%s
     """
     time_str = "{}-{}-{} {}:00:00".format(time.year,
                                           time.month, time.day, time.hour)
@@ -60,21 +60,22 @@ def fetch_candidate(candidate_id):
     return result
 
 
-def generate_the_trend(top10_trend_table):
+def generate_top20(results_top20):
+    # candidate_id/reply/toxic/opposing/retweet/state/party/position/name/handle/followers_num/friends_num
     trends = []
-    for i in range(10):
+    for r in results_top20:
         x = {}
-        x["id"] = str(top10_trend_table[i][0])
-        x["name"] = top10_trend_table[i][1]
-        x["state"] = top10_trend_table[i][7]
-        x["party"] = top10_trend_table[i][8]
-        x["handle"] = top10_trend_table[i][9]
-        x["position"] = top10_trend_table[i][10]
-        x["followers_count"] = top10_trend_table[i][2]
-        x["reply"] = top10_trend_table[i][3]
-        x["retweet"] = top10_trend_table[i][4]
-        x["toxic_reply"] = top10_trend_table[i][5]
-        x["opposing"] = top10_trend_table[i][6]
+        x["id"] = str(r[0])
+        x["name"] = r[8]
+        x["state"] = r[5]
+        x["party"] = r[6]
+        x["handle"] = r[9]
+        x["position"] = r[7]
+        x["followers_count"] = r[10]
+        x["reply"] = r[1]
+        x["retweet"] = r[4]
+        x["toxic_reply"] = r[2]
+        x["opposing"] = r[3]
         trends.append(x)
     return trends
 
@@ -82,8 +83,7 @@ def generate_the_trend(top10_trend_table):
 # id/time/reply/toxic_reply/opposing/retweet/
 
 
-def last_hour():
-    # last_hour_stat calculation
+def last_hour_top20():
     tt = datetime.now(timezone.utc)
     lasthour = tt.hour - 1
     if lasthour == -1:
@@ -91,16 +91,13 @@ def last_hour():
     t = datetime(tt.year, tt.month, tt.day,
                  tt.hour, 0, 0, tzinfo=timezone.utc)if tt.minute >= 15 else datetime(tt.year, tt.month, tt.day,
                                                                                      lasthour, 0, 0, tzinfo=timezone.utc)
-    # results contains: candidate_id/time/reply/toxic/opposing/retweet/state/party/position/name/handle/followers_num/friends_num
+    # results contains: candidate_id/reply/toxic/opposing/retweet/state/party/position/name/handle/followers_num/friends_num
     results = fetch_last_hour_stats(t)
     results.sort(
-        key=lambda x: (-math.log(x[3] + 1)/(math.log(x[-2] + 1)+1)))
-    for r in results[:10]:
-        print(r, math.log(r[3] + 1)/(math.log(r[-2] + 1)+1))
-    # top10_in_last_hour = sorted_last_hour_table[:10]
-    # trends_in_last_hour = generate_the_trend(top10_in_last_hour)
+        key=lambda x: (-math.log(x[2] + 1)/(math.log(x[-2] + 1)+1)))
+    top20 = generate_top20(results[:20])
 
-    # return trends_in_last_hour
+    return top20
 
 
 def lastNDays(candidate_id, n):
@@ -162,7 +159,9 @@ def lastNDays(candidate_id, n):
 if __name__ == "__main__":
 
     # print("Last Hour Stats")
-    last_hour()
+    top20 = last_hour_top20()
+    for r in top20:
+        print(r)
     # trends = lastHour()
     # for i in trends:
     #     print(i)
