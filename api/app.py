@@ -19,7 +19,7 @@ def fetchLastNDays():
 
     candidate_id = request.json["candidate_id"]
     n_days = int(request.json["n_days"])
-    data = lastNDays(candidate_id, n_days)
+    data = last_n_days(candidate_id, n_days)
     return jsonify(data)
 
 

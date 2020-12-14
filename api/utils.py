@@ -162,24 +162,23 @@ def last_n_days(candidate_id, n):
     data["info"] = info
     data["stats"] = stats
 
-    print(data["info"])
-    for s in data["stats"][:5]:
-        print(s)
-    for a, b in zip(data["examples"], data["example_urls"]):
-        print(a, b)
-
     return data
 
 
 if __name__ == "__main__":
 
-    # print("Last Hour Stats")
-    # top20 = last_hour_top20()
-    # for r in top20:
-    #     print(r)
+    print("Last Hour Stats")
+    top20 = last_hour_top20()
+    for r in top20:
+        print(r)
 
     id = "138203134"
-    last_n_days(id, 3)
+    data = last_n_days(id, 3)
+    print(data["info"])
+    for s in data["stats"][:5]:
+        print(s)
+    for a, b in zip(data["examples"], data["example_urls"]):
+        print(a, b)
     # end_time = datetime.now(timezone.utc)
     # start_time = end_time - timedelta(hours=10)
     # results = fetch_candidate_period_stats(id, start_time, end_time)
