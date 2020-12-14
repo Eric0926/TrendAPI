@@ -13,7 +13,7 @@ def fetch_last_hour_stats(time):
     db = pymysql.connect("35.202.99.165", "root", "twitter123", "twitter")
     cursor = db.cursor()
     sql = """
-        SELECT a.candidate_id, a.commit_time, a.reply, a.toxic_reply, a.opposing_party_toxic_reply, a.retweet, a.tweet_ids, a.toxic_user_ids, b.candidate_state, b.candidate_party, b.candidate_position, b.candidate_name, b.candidate_handle, b.candidate_followers_num, b.candidate_friends_num
+        SELECT a.candidate_id, a.commit_time, a.reply, a.toxic_reply, a.opposing_party_toxic_reply, a.retweet, b.candidate_state, b.candidate_party, b.candidate_position, b.candidate_name, b.candidate_handle, b.candidate_followers_num, b.candidate_friends_num
         FROM one_hour_stat a
         LEFT JOIN candidate_2020 b
         ON a.candidate_id = b.candidate_id
@@ -129,9 +129,7 @@ def last_hour():
     results = fetch_last_hour_stats(t)
     print(len(results))
     for r in results[:5]:
-        print(r[:6], end="")
-        print(r[8:])
-        print()
+        print(r)
 
     # sorted_last_hour_table = process_new_candidate_table(
     #     all_info_last_hour, all_last_hour)
