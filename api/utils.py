@@ -22,7 +22,7 @@ def fetch_last_hour_stats(time):
     time_str = "{}-{}-{} {}:00:00".format(time.year,
                                           time.month, time.day, time.hour)
     cursor.execute(sql, (time_str))
-    results = cursor.fetchall()
+    results = list(cursor.fetchall())
     db.close()
     return results
 
