@@ -109,7 +109,6 @@ def last_n_days(candidate_id, n):
     info["position"] = candidate_info[3]
     info["handle"] = candidate_info[5]
     info["followers_count"] = candidate_info[6]
-    print(info)
 
     d = datetime.now(timezone.utc)
     end_time = datetime(d.year, d.month, d.day + 1,
@@ -144,17 +143,28 @@ def last_n_days(candidate_id, n):
         stats[dateToIdx[commit_date]]["retweet"] += r[6]
 
         # examples, example_urls
-        # if r[6] is not None and len(data["examples"]) <= 10:
-        #     data["examples"].extend(r[6])
-        #     data["example_urls"].extend(r[7])
+        if r[7] != '' and len(data["examples"]) < 10:
+            tweet_ids = r[7].split(",")
+            for tweet_id in tweet_ids:
+                if len(data["examples"]) >= 10:
+                    break
+                query = datastore_client.query(kind='tweets')
+                query.add_filter('__key__', '=', tweet_id)
+                tweet = list(query.fetch(1))[0]
+                data["examples"].append(tweet['text'])
+                data["example_urls"].append(tweet['urls'][0] if len(
+                    tweet['urls']) > 0 else "https://twitter.com/{}".format(info["handle"]))
 
-    for s in stats[:5]:
+    data["info"] = info
+    data["stats"] = stats
+
+    print(data["info"])
+    for s in data["stats"][:5]:
         print(s)
+    for a, b in zip(data["examples"], data["example_urls"]):
+        print(a, b)
 
-    # data["info"] = info
-    # data["stats"] = stats
-
-    # return data
+    return data
 
 
 if __name__ == "__main__":
