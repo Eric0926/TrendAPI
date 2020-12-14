@@ -1,10 +1,12 @@
 import json
 import math
 from google.cloud import datastore
+from google.cloud.datastore.key import Key
 from datetime import datetime, timezone, timedelta
 import pymysql
 
-datastore_client = datastore.Client("yiqing-2020-twitter")
+PROJECT_ID_DATASTORE = "yiqing-2020-twitter"
+datastore_client = datastore.Client(PROJECT_ID_DATASTORE)
 
 
 def fetch_last_hour_stats(time):
@@ -148,8 +150,9 @@ def last_n_days(candidate_id, n):
             for tweet_id in tweet_ids:
                 if len(data["examples"]) >= 10:
                     break
+                key = Key('tweets', tweet_id, project=PROJECT_ID_DATASTORE)
                 query = datastore_client.query(kind='tweets')
-                query.add_filter('__key__', '=', int(tweet_id))
+                query.add_filter('__key__', '=', key)
                 tweet = list(query.fetch(1))[0]
                 data["examples"].append(tweet['text'])
                 data["example_urls"].append(tweet['urls'][0] if len(
