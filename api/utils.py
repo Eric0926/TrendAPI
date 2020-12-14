@@ -8,24 +8,15 @@ client = spanner.Client("yiqing-twitter-candidates")
 instance = client.instance("twitter-attack")
 database = instance.database("twitter_db")
 
-# * last hour reply num
-# * last hour retweet num
-# * last hour toxic
-# * last hour opposing
-# * 1-week reply
-# * 1-week retweet
-# * 1-week toxic
-# * 1-week opposing
-
 
 def fetch_last_hour_stats(time):
     db = pymysql.connect("35.202.99.165", "root", "twitter123", "twitter")
     cursor = db.cursor()
     sql = """
-        SELECT * 
-        FROM one_hour_stat
-        LEFT JOIN candidate_2020
-        ON one_hour_stat.candidate_id = candidate_2020.candidate_id
+        SELECT a.candidate_id, a.commit_time, a.reply, a.toxic_reply, a.opposing_party_toxic_reply, a.retweet, a.tweet_ids, a.toxic_user_ids, b.candidate_state, b.candidate_party, b.candidate_position, b.candidate_name, b.candidate_handle, b.candidate_followers_num, b.candidate_friends_num
+        FROM one_hour_stat a
+        LEFT JOIN candidate_2020 b
+        ON a.candidate_id = b.candidate_id
         WHERE commit_time=%s
         ORDER BY one_hour_stat.candidate_id
     """
@@ -138,8 +129,8 @@ def last_hour():
     results = fetch_last_hour_stats(t)
     print(len(results))
     for r in results[:5]:
-        print(r[1:7], end="")
-        print(r[9:])
+        print(r[:6], end="")
+        print(r[8:])
         print()
 
     # sorted_last_hour_table = process_new_candidate_table(
