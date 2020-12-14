@@ -153,6 +153,7 @@ def last_n_days(candidate_id, n):
                 key = Key('tweets', tweet_id, project=PROJECT_ID_DATASTORE)
                 query = datastore_client.query(kind='tweets')
                 query.add_filter('__key__', '=', key)
+                print(tweet_id)
                 tweet = list(query.fetch(1))[0]
                 data["examples"].append(tweet['text'])
                 data["example_urls"].append(tweet['urls'][0] if len(
