@@ -136,7 +136,7 @@ def last_hour():
         return []
     candidate_infos = fetch_candidates(candidate_ids)
     print(len(candidate_infos))
-    for info, r in zip(candidate_infos, results)[:5]:
+    for info, r in list(zip(candidate_infos, results))[:5]:
         print(info)
         print(r[:-2])
         print()
