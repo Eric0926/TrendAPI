@@ -44,7 +44,7 @@ database = instance.database("twitter_db")
 #     return list(result)
 
 
-def fetchLastHourStats(time):
+def fetch_last_hour_stats(time):
     db = pymysql.connect("35.202.99.165", "root", "twitter123", "twitter")
     cursor = db.cursor()
     sql = """
@@ -53,15 +53,27 @@ def fetchLastHourStats(time):
     """
     time_str = "{}-{}-{} {}:00:00".format(time.year,
                                           time.month, time.day, time.hour)
-    print(time_str)
     cursor.execute(sql, (time_str))
     results = cursor.fetchall()
     db.close()
     return results
 
 
-def fetchCandidatePeriodStats(candidate_id, start_time, end_time):
+def fetch_candidate_period_stats(candidate_id, start_time, end_time):
     db = pymysql.connect("35.202.99.165", "root", "twitter123", "twitter")
+    cursor = db.cursor()
+    sql = """
+        SELECT * FROM one_hour_stat
+        WHERE commit_time between %s and %s and candidate_id=%s
+    """
+    start_time_str = "{}-{}-{} {}:00:00".format(start_time.year,
+                                                start_time.month, start_time.day, start_time.hour)
+    end_time_str = "{}-{}-{} {}:00:00".format(end_time.year,
+                                              end_time.month, end_time.day, end_time.hour)
+    cursor.execute(sql, (start_time_str, end_time_str, candidate_id))
+    results = cursor.fetchall()
+    db.close()
+    return results
 
 
 # candidate-2020 contains id, name followers_count, friends_count, handle, party, position
@@ -126,7 +138,7 @@ def generate_the_trend(top10_trend_table):
     return trends
 
 
-def lastHour():
+def last_hour():
     # last_hour_stat calculation
     tt = datetime.now(timezone.utc)
     lasthour = tt.hour - 1
@@ -136,7 +148,7 @@ def lastHour():
                  tt.hour, 0, 0, tzinfo=timezone.utc)if tt.minute >= 15 else datetime(tt.year, tt.month, tt.day,
                                                                                      lasthour, 0, 0, tzinfo=timezone.utc)
     # last hour table contains: # id/time/reply/toxic/opposing/retweet
-    results = fetchLastHourStats(t)
+    results = fetch_last_hour_stats(t)
     print(len(results))
     for r in results[:5]:
         print(r)
@@ -214,12 +226,19 @@ def lastNDays(candidate_id, n):
 
 if __name__ == "__main__":
 
-    print("Last Hour Stats")
-    lastHour()
+    # print("Last Hour Stats")
+    last_hour()
     # trends = lastHour()
     # for i in trends:
     #     print(i)
     # print("\n")
+
+    id = "138203134"
+    end_time = datetime.now(timezone.utc)
+    start_time = end_time - timedelta(hours=10)
+    results = fetch_candidate_period_stats(id, start_time, end_time)
+    for r in results:
+        print(r)
 
     # id = "1249982359"
     # n = 10
