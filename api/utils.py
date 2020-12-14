@@ -39,6 +39,7 @@ def fetch_candidate_period_stats(candidate_id, start_time, end_time):
     sql = """
         SELECT * FROM one_hour_stat
         WHERE candidate_id=%s and commit_time>=%s and commit_time<%s
+        ORDER BY candidate_id
     """
     start_time_str = "{}-{}-{} {}:00:00".format(start_time.year,
                                                 start_time.month, start_time.day, start_time.hour)
@@ -57,6 +58,7 @@ def fetch_candidates(candidate_ids):
     sql = """
         SELECT * FROM candidate_2020
         WHERE candidate_id IN ({})
+        ORDER BY candidate_id
     """.format(candidate_ids)
     cursor.execute(sql)
     results = cursor.fetchall()
@@ -130,7 +132,6 @@ def last_hour():
                                                                                      lasthour, 0, 0, tzinfo=timezone.utc)
     # results contains: entry_id/candidate_id/time/reply/toxic/opposing/retweet/tweet_ids/toxic_user_ids
     results = fetch_last_hour_stats(t)
-
     candidate_ids = ",".join(str(x[1]) for x in results)
     if candidate_ids == "":
         return []
@@ -139,7 +140,7 @@ def last_hour():
     print(len(candidate_infos))
     for info, r in list(zip(candidate_infos, results))[:5]:
         print(info)
-        print(r[:-2])
+        print(r[1:-2])
         print()
 
     # sorted_last_hour_table = process_new_candidate_table(
