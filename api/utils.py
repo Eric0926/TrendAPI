@@ -2,6 +2,7 @@ import json
 import math
 from google.cloud import spanner
 from datetime import datetime, timezone, timedelta
+import pymysql
 
 client = spanner.Client("yiqing-twitter-candidates")
 instance = client.instance("twitter-attack")
@@ -20,27 +21,45 @@ database = instance.database("twitter_db")
 # id/time/reply/toxic/opposing/retweet
 
 
-def fetchLastHourStats(transaction, time):
-    # test = "2020-10-08T06:00:00Z"
-    query = """
-            SELECT * FROM one_hour_stat
-            WHERE commit_time = TIMESTAMP("{}") AND toxic_reply != 0
-            """.format(time)
-    result = transaction.execute_sql(query)
-    return list(result)
+def fetchLastHourStats(time):
+    db = pymysql.connect("35.202.99.165", "root", "twitter123", "twitter")
+    cursor = db.cursor()
+    sql = """
+        SELECT * FROM one_hour_stat
+        WHERE commit_time="%s"
+    """
+    time_str = "{}-{}-{} {}:00:00".format(time.year,
+                                          time.month, time.day, time.hour)
+    cursor.excute(sql, (time_str))
+    results = cursor.fetchall()
+    return results
 
 
-def fetchCandidatePeriodStats(transaction, candidate_id, start_time, end_time):
-    # test = "2020-10-08T06:00:00Z"
-    query = """
-            SELECT * FROM one_hour_stat
-            WHERE candidate_id = {}
-            AND commit_time >= TIMESTAMP("{}")
-            AND commit_time < TIMESTAMP("{}")
-            ORDER BY commit_time DESC
-            """.format(candidate_id, start_time, end_time)
-    result = transaction.execute_sql(query)
-    return list(result)
+def fetchCandidatePeriodStats(candidate_id, start_time, end_time):
+    db = pymysql.connect("35.202.99.165", "root", "twitter123", "twitter")
+
+
+# def fetchLastHourStats(transaction, time):
+#     # test = "2020-10-08T06:00:00Z"
+#     query = """
+#             SELECT * FROM one_hour_stat
+#             WHERE commit_time = TIMESTAMP("{}") AND toxic_reply != 0
+#             """.format(time)
+#     result = transaction.execute_sql(query)
+#     return list(result)
+
+
+# def fetchCandidatePeriodStats(transaction, candidate_id, start_time, end_time):
+#     # test = "2020-10-08T06:00:00Z"
+#     query = """
+#             SELECT * FROM one_hour_stat
+#             WHERE candidate_id = {}
+#             AND commit_time >= TIMESTAMP("{}")
+#             AND commit_time < TIMESTAMP("{}")
+#             ORDER BY commit_time DESC
+#             """.format(candidate_id, start_time, end_time)
+#     result = transaction.execute_sql(query)
+#     return list(result)
 
 
 # candidate-2020 contains id, name followers_count, friends_count, handle, party, position
@@ -115,7 +134,12 @@ def lastHour():
                  tt.hour, 0, 0, tzinfo=timezone.utc)if tt.minute >= 15 else datetime(tt.year, tt.month, tt.day,
                                                                                      lasthour, 0, 0, tzinfo=timezone.utc)
     # last hour table contains: # id/time/reply/toxic/opposing/retweet
-    results = database.run_in_transaction(fetchLastHourStats, t)
+    results = fetchLastHourStats(t)
+    print(len(results))
+    for r in results[:5]:
+        print(r)
+    pass
+
     all_last_hour = sorted(results, key=lambda x: x[0])
     all_id_last_hour = ",".join(str(x[0]) for x in all_last_hour)
     if all_id_last_hour == "":
@@ -190,17 +214,18 @@ def lastNDays(candidate_id, n):
 if __name__ == "__main__":
 
     print("Last Hour Stats")
-    trends = lastHour()
-    for i in trends:
-        print(i)
-    print("\n")
+    lastHour()
+    # trends = lastHour()
+    # for i in trends:
+    #     print(i)
+    # print("\n")
 
-    id = "1249982359"
-    n = 10
-    print("Last {} Days for {}".format(n, id))
-    data = lastNDays(id, n)
-    print(data["info"])
-    for i in data["stats"]:
-        print(i)
-    print(data["examples"])
-    print(data["example_urls"])
+    # id = "1249982359"
+    # n = 10
+    # print("Last {} Days for {}".format(n, id))
+    # data = lastNDays(id, n)
+    # print(data["info"])
+    # for i in data["stats"]:
+    #     print(i)
+    # print(data["examples"])
+    # print(data["example_urls"])
