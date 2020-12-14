@@ -24,6 +24,7 @@ def fetch_last_hour_stats(time):
     sql = """
         SELECT * FROM one_hour_stat
         WHERE commit_time=%s
+        ORDER BY candidate_id
     """
     time_str = "{}-{}-{} {}:00:00".format(time.year,
                                           time.month, time.day, time.hour)
